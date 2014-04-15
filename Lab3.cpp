@@ -7,9 +7,17 @@
 
 #include "ShaderLoader.cpp"
 #include "Angel.h"
+#include <cstdlib>
+#include <glm/glm.hpp>
+#include "glm/gtc/matrix_transform.hpp"
+
 using namespace std;
 
+void rotate(GLuint locate);
+
 GLuint vaoID, vboID[2];//vao and vbo names
+GLuint eboID;
+GLuint program;
 			//x	y	z	//Vertex Array Specifies the points of a shape
 GLfloat vertexarray[]={	-0.5f,	0.5f,	0.0f,	//0
 			0.5f,	0.5f,	0.0f,	//1
@@ -23,11 +31,14 @@ GLfloat colorarray[]={	1.0f,	1.0f,	0.0f,	1.0f,	//0-yellow
                        	1.0f,	0.0f,	1.0f,	1.0f,	//2-purple
                        	0.5f,	0.5f,	1.0f,	1.0f,	//3-indigo
                        	1.0f,	0.5f,	0.5f,	1.0f,	//4-peach
-                       };                       
+                       };
+
+GLfloat pit,yaw,scalar=1;
+glm::vec3 cubeTran;
 
 void init(){
 
-  InitShader("vertexshader.glsl", "fragmentshader.glsl");//Load shaders and use the resulting shader program
+  program = InitShader("vertexshader.glsl", "fragmentshader.glsl");//Load shaders and use the resulting shader program
   
   //Create a vertex array object
   glGenVertexArrays(1, &vaoID);//generates 1 vertex array objects for vaoID
@@ -48,7 +59,18 @@ void init(){
 
 void drawscene(){
   glClear(GL_COLOR_BUFFER_BIT);
+  glm::mat4 trans;
+ 
+  //trans= glm::translate(glm::mat4(1.0f));
+
+  trans=glm::translate(trans,cubeTran);//translate the cube
+  trans=glm::rotate(trans,pit,glm::vec3(1,0,0));//rotate the cube around the x axis
+  trans=glm::rotate(trans,yaw,glm::vec3(0,1,0));//rotate the cube arround the y axis
+  trans=glm::scale(trans,glm::vec3(scalar));//scaling the cube
   glDrawArrays(GL_POLYGON,0,3);
+  GLint tempLoc = glGetUniformLocation(program,"modelMatrix");//Matrix that handle the transformations
+  glUniformMatrix4fv(tempLoc,1,GL_FALSE,&trans[0][0]);
+  glDrawElements(GL_POLYGON,24,GL_UNSIGNED_BYTE,NULL);
   glFlush();
 }
 
@@ -60,23 +82,63 @@ void mousepress(int button, int state, int x, int y){
   }
 }
 
+void keypress(unsigned char key, int x, int y){
+	switch( key ) {
+	case 27://escape
+		fprintf(stderr, "Gave up already?\n");
+		exit( EXIT_SUCCESS );
+		break;
+	case 'w':
+		cubeTran.y+=2;
+		break;
+	case 's':
+		cubeTran.y-=2;
+		break;
+	case 'a':
+		cubeTran.x-=2;
+		break;
+	case 'd':
+		cubeTran.x+=2;
+		break;
+	case 'e':
+		scalar+=.1f;
+		break;
+	case 'q':
+		scalar-=.1f;
+		break;
+	case 'i':
+		pit+=2;
+		break;
+	case 'k':
+		pit-=2;
+		break;
+	case 'j':
+		yaw+=2;
+		break;
+	case 'l':
+		yaw-=2;
+		break;
+	}
+}
 
 int main(int argc,char ** argv){
 
   glutInit(&argc, argv);
+  glutInitWindowSize(500, 500);
+  glutInitWindowPosition(0, 0);
   glutCreateWindow("Lab 3 - Not a cube");//creates the window with the specified name
   
   //initializes glew
   glewExperimental=GL_TRUE;
-  if(glewInit()){
-    fprintf(stderr, "Unable to initalize GLEW");
-    exit(EXIT_FAILURE);
+  if(glewInit()){//initialize glew, if it fails...
+	fprintf(stderr, "Unable to initalize GLEW");//Yell at programmer GLEW not working
+	exit(EXIT_FAILURE);//kill process, exit in FAILURE if GLEW doesn't work'
   }
   
   glutInitContextVersion(4, 3);//specifies the version of opengl
   glutInitContextProfile(GLUT_CORE_PROFILE|GLUT_COMPATIBILITY_PROFILE);//specifies what profile your using
 	
-	init();//Call init function
+  init();//Call init function
 
   //returns what version of opengl and glsl your computer can use
   const GLubyte* version=glGetString(GL_SHADING_LANGUAGE_VERSION);
@@ -86,7 +148,8 @@ int main(int argc,char ** argv){
   fprintf(stderr,"Opengl version %s\n", version);
 
   glutDisplayFunc(drawscene);//displays callback draws the shapes
-  glutMouseFunc(mousepress);//control callback specifies the mouse controls
+  glutMouseFunc(mousepress);//get mouse inputs
+  glutKeyboardFunc(keypress);//get keyboard inputs
   glutMainLoop();//sets opengl state in a neverending loop
   return 0;
 }
