@@ -72,7 +72,10 @@ void init(){
 }
 
 void drawscene(){
-  glClear(GL_COLOR_BUFFER_BIT);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_DEPTH_TEST);
+  
+  glUseProgram(program);
   glm::mat4 trans;
  
   //trans= glm::translate(glm::mat4(1.0f));
@@ -88,8 +91,9 @@ void drawscene(){
   glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
   
   glDrawElements(GL_TRIANGLES,sizeof(elems),GL_UNSIGNED_BYTE,NULL);
-  glFlush();
-  
+  //glFlush();
+  glutSwapBuffers();
+  glutPostRedisplay();
   //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
   //glDrawArrays( GL_TRIANGLES, 0, NumVertices );
   //glutSwapBuffers();
