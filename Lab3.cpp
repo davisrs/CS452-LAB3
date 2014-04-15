@@ -21,11 +21,11 @@ glm::vec3 cubeTran;
 GLuint vaoID, vboID[2];//vao and vbo names
 GLuint eboID;
 GLuint program;
-			//x	y	z	//Vertex Array Specifies the points of a shape
-GLfloat vertexarray[]={	-0.5f,	0.5f,	0.0f,	//0
-			0.5f,	0.5f,	0.0f,	//1
+				//x	y	z	//Vertex Array Specifies the points of a shape
+GLfloat vertexarray[]={	-0.5f,0.5f,	0.0f,	//0
+				0.5f,	0.5f,	0.0f,	//1
                        	0.5f,	0.5f,	0.0f,	//2
-                       	-0.5f,	-0.5f,	0.0f,	//3
+                       -0.5f,-0.5f,	0.0f,	//3
                        	0.0f,	0.0f,	0.5f	//4
                        };
                        //r	g	b	alpha	//color array
@@ -66,7 +66,7 @@ void init(){
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(elems),elems,GL_STATIC_DRAW);
 
   program = InitShader("vertexshader.glsl", "fragmentshader.glsl");//Load shaders and use the resulting shader program
-
+  
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
 }
@@ -84,14 +84,14 @@ void drawscene(){
   trans=glm::rotate(trans,pit,glm::vec3(1,0,0));//rotate the cube around the x axis
   trans=glm::rotate(trans,yaw,glm::vec3(0,1,0));//rotate the cube arround the y axis
   trans=glm::scale(trans,glm::vec3(scalar));//scaling the cube
-  glDrawArrays(GL_POLYGON,0,3);
+  //glDrawArrays(GL_POLYGON,0,3);
   GLint tempLoc = glGetUniformLocation(program,"modelMatrix");//Matrix that handle the transformations
   glUniformMatrix4fv(tempLoc,1,GL_FALSE,&trans[0][0]);
   
-  glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
+  //glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
   
   glDrawElements(GL_TRIANGLES,sizeof(elems),GL_UNSIGNED_BYTE,NULL);
-  //glFlush();
+  glFlush();
   glutSwapBuffers();
   glutPostRedisplay();
   //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );

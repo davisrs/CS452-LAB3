@@ -10,6 +10,14 @@
 //First include Angel's Crazy Library because why not at this point?
 #include "Angel.h" // His file
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#include <vector>
+#include <cstdio>
+#include <iostream>
+
 namespace Angel { //Honestly this scares me, last time it segfaulted
 
 //We load our shader files as an array of characters AKA a string
@@ -121,6 +129,21 @@ GLuint InitShader(const char* vShaderFileName, const char* fShaderFileName){
 	
 	//Use program object--Finally!
 	glUseProgram(program);//Installs the program object as part of the current rendering state!
+	
+	//For matrix math	
+	glm::mat4 view;
+	view = glm::lookAt(//position and direction of camera
+		glm::vec3(0.0f, 0.0f, 50.0f),
+		glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3(0.0f, 1.0f, 0.0f)
+	);
+	GLint tempLoc = glGetUniformLocation(program, "viewMatrix");//Matrix that handles the camera movement
+	glUniformMatrix4fv(tempLoc, 1, GL_FALSE, &view[0][0]);
+  
+	glm::mat4 mainProjMatrix;
+	mainProjMatrix = glm::perspective(57.0,1.0,.1,500.0);//Matrix that handle the orthographic or perspective viewing
+	tempLoc = glGetUniformLocation(program, "Matrix");
+	glUniformMatrix4fv(tempLoc, 1, GL_FALSE, &mainProjMatrix[0][0]);
 	
 	return program;//returns programID to main function
 }//End the InitShaderFunction
