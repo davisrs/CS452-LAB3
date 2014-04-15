@@ -10,6 +10,7 @@
 //First include Angel's Crazy Library because why not at this point?
 #include "Angel.h" // His file
 
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>

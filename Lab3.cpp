@@ -8,6 +8,8 @@
 #include "ShaderLoader.cpp"
 #include "Angel.h"
 #include <cstdlib>
+
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -74,29 +76,18 @@ void init(){
 void drawscene(){
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glEnable(GL_DEPTH_TEST);
-  
   glUseProgram(program);
   glm::mat4 trans;
- 
-  //trans= glm::translate(glm::mat4(1.0f));
-
   trans=glm::translate(trans,cubeTran);//translate the cube
   trans=glm::rotate(trans,pit,glm::vec3(1,0,0));//rotate the cube around the x axis
   trans=glm::rotate(trans,yaw,glm::vec3(0,1,0));//rotate the cube arround the y axis
   trans=glm::scale(trans,glm::vec3(scalar));//scaling the cube
-  //glDrawArrays(GL_POLYGON,0,3);
   GLint tempLoc = glGetUniformLocation(program,"modelMatrix");//Matrix that handle the transformations
-  glUniformMatrix4fv(tempLoc,1,GL_FALSE,&trans[0][0]);
-  
-  //glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
-  
+  glUniformMatrix4fv(tempLoc,1,GL_FALSE,&trans[0][0]); 
   glDrawElements(GL_TRIANGLES,sizeof(elems),GL_UNSIGNED_BYTE,NULL);
   glFlush();
   glutSwapBuffers();
   glutPostRedisplay();
-  //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-  //glDrawArrays( GL_TRIANGLES, 0, NumVertices );
-  //glutSwapBuffers();
 }
 
 void mousepress(int button, int state, int x, int y){
@@ -105,6 +96,17 @@ void mousepress(int button, int state, int x, int y){
   else if(button==GLUT_LEFT_BUTTON && state==GLUT_DOWN){
     drawscene();
   }
+}
+
+void mousemove(int x, int y){//passive motion callback for a window is called when the mouse moves within the window while no mouse buttons are pressed. 
+	if(x>1){
+		yaw+=(x-300)/10.0;
+		printf("\nIncYaw\n");
+	}
+	if(y>1){
+	pit+=(y-300)/10.0;
+	printf("\nIncPitch\n");
+	}
 }
 
 void keypress(unsigned char key, int x, int y){
@@ -185,6 +187,7 @@ int main(int argc,char ** argv){
   glutDisplayFunc(drawscene);//displays callback draws the shapes
   glutMouseFunc(mousepress);//get mouse inputs
   glutKeyboardFunc(keypress);//get keyboard inputs
+  glutMotionFunc(mousemove);
   glutMainLoop();//sets opengl state in a neverending loop
   return 0;
 }
