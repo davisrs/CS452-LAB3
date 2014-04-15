@@ -15,6 +15,9 @@ using namespace std;
 
 void rotate(GLuint locate);
 
+GLfloat pit,yaw,scalar=1;
+glm::vec3 cubeTran;
+
 GLuint vaoID, vboID[2];//vao and vbo names
 GLuint eboID;
 GLuint program;
@@ -23,23 +26,27 @@ GLfloat vertexarray[]={	-0.5f,	0.5f,	0.0f,	//0
 			0.5f,	0.5f,	0.0f,	//1
                        	0.5f,	0.5f,	0.0f,	//2
                        	-0.5f,	-0.5f,	0.0f,	//3
-                       	0.0f,	0.0f,	0.5f,	//4
+                       	0.0f,	0.0f,	0.5f	//4
                        };
                        //r	g	b	alpha	//color array
 GLfloat colorarray[]={	1.0f,	1.0f,	0.0f,	1.0f,	//0-yellow
                        	0.0f,	1.0f,	0.0f,	1.0f,	//1-green
                        	1.0f,	0.0f,	1.0f,	1.0f,	//2-purple
                        	0.5f,	0.5f,	1.0f,	1.0f,	//3-indigo
-                       	1.0f,	0.5f,	0.5f,	1.0f,	//4-peach
+                       	1.0f,	0.5f,	0.5f,	1.0f	//4-peach
                        };
 
-GLfloat pit,yaw,scalar=1;
-glm::vec3 cubeTran;
+GLubyte elems[]={	0,1,2,	//base
+			1,3,2,	//base
+			0,2,4,	//l
+			0,1,4,	//t
+			1,3,4,	//r
+			2,3,4
+};
 
 void init(){
-
-  program = InitShader("vertexshader.glsl", "fragmentshader.glsl");//Load shaders and use the resulting shader program
-  
+  glEnable(GL_DEPTH_TEST);
+  glViewport(0, 0, 600, 600);
   //Create a vertex array object
   glGenVertexArrays(1, &vaoID);//generates 1 vertex array objects for vaoID
   glBindVertexArray(vaoID);//binds VAO
@@ -52,6 +59,13 @@ void init(){
   glBindBuffer(GL_ARRAY_BUFFER, vboID[1]);
   glBufferData(GL_ARRAY_BUFFER,sizeof(colorarray),colorarray,GL_STATIC_DRAW);
   glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+//No idea what this does
+  glGenBuffers(1,&eboID);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,eboID);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(elems),elems,GL_STATIC_DRAW);
+
+  program = InitShader("vertexshader.glsl", "fragmentshader.glsl");//Load shaders and use the resulting shader program
 
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
@@ -70,8 +84,15 @@ void drawscene(){
   glDrawArrays(GL_POLYGON,0,3);
   GLint tempLoc = glGetUniformLocation(program,"modelMatrix");//Matrix that handle the transformations
   glUniformMatrix4fv(tempLoc,1,GL_FALSE,&trans[0][0]);
-  glDrawElements(GL_POLYGON,24,GL_UNSIGNED_BYTE,NULL);
+  
+  glPolygonMode(GL_FRONT_AND_BACK, GL_QUADS);
+  
+  glDrawElements(GL_TRIANGLES,sizeof(elems),GL_UNSIGNED_BYTE,NULL);
   glFlush();
+  
+  //glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+  //glDrawArrays( GL_TRIANGLES, 0, NumVertices );
+  //glutSwapBuffers();
 }
 
 void mousepress(int button, int state, int x, int y){
@@ -90,33 +111,43 @@ void keypress(unsigned char key, int x, int y){
 		break;
 	case 'w':
 		cubeTran.y+=2;
+		printf("\nUp\n");
 		break;
 	case 's':
 		cubeTran.y-=2;
+		printf("\nDown\n");
 		break;
 	case 'a':
 		cubeTran.x-=2;
+		printf("\nLeft\n");
 		break;
 	case 'd':
 		cubeTran.x+=2;
+		printf("\nRight\n");
 		break;
 	case 'e':
 		scalar+=.1f;
+		printf("\nScaleUp\n");
 		break;
 	case 'q':
 		scalar-=.1f;
+		printf("\nScaleDown\n");
 		break;
 	case 'i':
 		pit+=2;
+		printf("\nIncPitch\n");
 		break;
 	case 'k':
 		pit-=2;
+		printf("\nDecPitch\n");
 		break;
 	case 'j':
 		yaw+=2;
+		printf("\nIncYaw\n");
 		break;
 	case 'l':
 		yaw-=2;
+		printf("\nDecYaw\n");
 		break;
 	}
 }
