@@ -40,10 +40,10 @@ GLfloat colorarray[]={	1.0f,	1.0f,	0.0f,	1.0f,	//0-yellow
 
 GLubyte elems[]={	0,1,2,	//base
 			1,3,2,	//base
-			0,2,4,	//l
+			0,4,2,	//l
 			0,1,4,	//t
 			1,3,4,	//r
-			2,3,4
+			3,4,2
 };
 
 void init(){
@@ -84,7 +84,7 @@ void drawscene(){
   trans=glm::scale(trans,glm::vec3(scalar));//scaling the cube
   GLint tempLoc = glGetUniformLocation(program,"modelMatrix");//Matrix that handle the transformations
   glUniformMatrix4fv(tempLoc,1,GL_FALSE,&trans[0][0]); 
-  glDrawElements(GL_TRIANGLES,sizeof(elems),GL_UNSIGNED_BYTE,NULL);
+  glDrawElements(GL_TRIANGLE_FAN,sizeof(elems),GL_UNSIGNED_BYTE,NULL);
   glFlush();
   glutSwapBuffers();
   glutPostRedisplay();
