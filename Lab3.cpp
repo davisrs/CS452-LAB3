@@ -24,26 +24,26 @@ GLuint vaoID, vboID[2];//vao and vbo names
 GLuint eboID;
 GLuint program;
 				//x	y	z	//Vertex Array Specifies the points of a shape
-GLfloat vertexarray[]={	-0.5f,0.5f,	0.0f,	//0
-				0.5f,	0.5f,	0.0f,	//1
-                       	0.5f,	0.5f,	0.0f,	//2
-                       -0.5f,-0.5f,	0.0f,	//3
-                       	0.0f,	0.0f,	0.5f	//4
-                       };
+GLfloat vertexarray[]={	-0.5f,	0.5f,	0.0f,	//vertex 0
+			0.5f,	0.5f,	0.0f,	//vertex 1
+			-0.5f,	-0.5f,	0.0f,	//vertex 2
+			0.5f,	-0.5f,	0.0f,	//vertex 3
+			0.0f,	0.0f,	1.0f	//vertex 4
+			};
                        //r	g	b	alpha	//color array
 GLfloat colorarray[]={	1.0f,	1.0f,	0.0f,	1.0f,	//0-yellow
-                       	0.0f,	1.0f,	0.0f,	1.0f,	//1-green
-                       	1.0f,	0.0f,	1.0f,	1.0f,	//2-purple
-                       	0.5f,	0.5f,	1.0f,	1.0f,	//3-indigo
-                       	1.0f,	0.5f,	0.5f,	1.0f	//4-peach
+			0.0f,	1.0f,	0.0f,	1.0f,	//1-green
+			1.0f,	0.0f,	1.0f,	1.0f,	//2-purple
+			0.5f,	0.5f,	1.0f,	1.0f,	//3-indigo
+			1.0f,	0.5f,	0.5f,	1.0f	//4-peach
                        };
 
-GLubyte elems[]={	0,1,2,	//base
+GLubyte elems[]={	0,1,2,	//base	//Vertices of primitives to draw
 			1,3,2,	//base
 			0,4,2,	//l
 			0,1,4,	//t
-			1,3,4,	//r
-			3,4,2
+			1,4,3,	//r
+			3,4,2	//b
 };
 
 void init(){
@@ -84,7 +84,7 @@ void drawscene(){
   trans=glm::scale(trans,glm::vec3(scalar));//scaling the cube
   GLint tempLoc = glGetUniformLocation(program,"modelMatrix");//Matrix that handle the transformations
   glUniformMatrix4fv(tempLoc,1,GL_FALSE,&trans[0][0]); 
-  glDrawElements(GL_TRIANGLE_FAN,sizeof(elems),GL_UNSIGNED_BYTE,NULL);
+  glDrawElements(GL_TRIANGLES,sizeof(elems),GL_UNSIGNED_BYTE,NULL);
   glFlush();
   glutSwapBuffers();
   glutPostRedisplay();
@@ -99,13 +99,13 @@ void mousepress(int button, int state, int x, int y){
 }
 
 void mousemove(int x, int y){//passive motion callback for a window is called when the mouse moves within the window while no mouse buttons are pressed. 
-	if(x>1){
-		yaw+=(x-300)/10.0;
+	if(y>1){
+		yaw+=y/300.;//(x-300)/10.0;
 		printf("\nIncYaw\n");
 	}
-	if(y>1){
-	pit+=(y-300)/10.0;
-	printf("\nIncPitch\n");
+	if(x>1){
+		pit=x/300.;//pit+=(y-300)/10.0;
+		printf("\nIncPitch\n");
 	}
 }
 
@@ -140,19 +140,19 @@ void keypress(unsigned char key, int x, int y){
 		printf("\nScaleDown\n");
 		break;
 	case 'i':
-		pit+=2;
+		pit+=.1;
 		printf("\nIncPitch\n");
 		break;
 	case 'k':
-		pit-=2;
+		pit-=.1;
 		printf("\nDecPitch\n");
 		break;
 	case 'j':
-		yaw+=2;
+		yaw+=.1;
 		printf("\nIncYaw\n");
 		break;
 	case 'l':
-		yaw-=2;
+		yaw-=.1;
 		printf("\nDecYaw\n");
 		break;
 	}
